@@ -4,16 +4,24 @@ certify_vault.py — Certificazione Digitale per il Vault Obsidian
 Basato sul Capitolo 4 di "Art Between Matter and Code" di G. Moioli
 Caso pratico per la tesi di laurea in Scultura, Accademia di Brera
 
+Sistema di certificazione a 3 livelli:
+  Livello 1 — Metadati interni (embedded)
+  Livello 2 — Certificato SHA-256 + JSON (chain verification)
+  Livello 3 — OpenTimestamps su blockchain Bitcoin
+
 Funzionalita:
   1. Scansiona tutti i file .md, genera hash SHA-256
   2. Produce un certificato digitale in formato JSON
   3. Supporta la verifica a catena (chain verification)
   4. Modalita verifica: confronta lo stato attuale con l'ultimo certificato
+  5. Ancoraggio blockchain via OpenTimestamps (Livello 3)
 
 Utilizzo:
-  python certify_vault.py           Crea un nuovo certificato
-  python certify_vault.py --verify  Verifica l'integrita dei file
-  python certify_vault.py --list    Mostra la cronologia dei certificati
+  python certify_vault.py                   Crea un nuovo certificato
+  python certify_vault.py --verify          Verifica l'integrita dei file
+  python certify_vault.py --stamp           Crea certificato + ancoraggio blockchain
+  python certify_vault.py --verify-stamp    Verifica l'ancoraggio blockchain
+  python certify_vault.py --list            Mostra la cronologia dei certificati
 """
 
 import os
@@ -25,6 +33,9 @@ import sys
 import io
 from datetime import datetime
 
+# OpenTimestamps per ancoraggio blockchain
+from opentimestamps.calendar import RemoteCalendar
+
 # Compatibilita terminale Windows (codifica UTF-8)
 if sys.platform == "win32":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
@@ -35,6 +46,13 @@ if sys.platform == "win32":
 VAULT_PATH = os.path.dirname(os.path.abspath(__file__))
 CERT_DIR = os.path.join(VAULT_PATH, "_certificates")
 VAULT_NAME = "Il Mio Archivio della Conoscenza"
+
+# OpenTimestamps per Livello 3 (blockchain)
+OTS_CALENDARS = (
+    "https://a.pool.opentimestamps.org",
+    "https://b.pool.opentimestamps.org",
+    "https://a.pool.eternitywall.com",
+)
 
 # ============================================================
 # Funzioni principali
@@ -289,6 +307,153 @@ def list_certificates():
 
 
 # ============================================================
+# Livello 3 — OpenTimestamps (blockchain Bitcoin)
+# ============================================================
+
+def stamp_certificate():
+    """Ancora l'ultimo certificato alla blockchain Bitcoin via OpenTimestamps"""
+    cert = load_latest_certificate()
+    if cert is None:
+        print("Nessun certificato trovato. Creane uno prima.")
+        return
+
+    cert_path = os.path.join(CERT_DIR, f"{cert['certificato']['id']}.json")
+    ots_path = cert_path + ".ots"
+
+    # Calcola digest SHA-256 del file certificato
+    digest = hashlib.sha256()
+    with open(cert_path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            digest.update(chunk)
+    file_digest = digest.digest()
+
+    print("=" * 60)
+    print("  LIVELLO 3 — ANCORAGGIO BLOCKCHAIN (OpenTimestamps)")
+    print("=" * 60)
+    print()
+    print(f"  Certificato: {cert['certificato']['id']}")
+    print(f"  Digest SHA-256: {digest.hexdigest()[:20]}...")
+    print()
+
+    # Prova ciascun calendario OTS
+    success = False
+    for calendar_url in OTS_CALENDARS:
+        try:
+            print(f"  Invio a {calendar_url}...")
+            calendar = RemoteCalendar(calendar_url)
+            timestamp = calendar.submit(file_digest)
+
+            # Serializza il timestamp OTS (in memoria poi su file per compatibilita Windows)
+            from opentimestamps.core.serialize import BytesSerializationContext
+            buf = BytesSerializationContext()
+            timestamp.serialize(buf)
+            with open(ots_path, "wb") as f:
+                f.write(buf.getbytes())
+
+            success = True
+            print(f"  OK — Ricevuto impegno dal calendario")
+            break
+        except Exception as e:
+            print(f"  Fallito: {e}")
+            continue
+
+    if success:
+        print()
+        print(f"  File OTS salvato: {ots_path}")
+        print()
+        print("  COSA SUCCEDE ORA:")
+        print("  Il calendario raggruppa questa richiesta con altre")
+        print("  e la ancora alla blockchain Bitcoin.")
+        print("  La conferma richiede circa 1 ora.")
+        print()
+        print("  Per verificare in seguito:")
+        print(f"    python certify_vault.py --verify-stamp")
+    else:
+        print("  ERRORE: impossibile contattare i calendari OTS.")
+        print("  Verifica la connessione Internet e riprova.")
+        if os.path.exists(ots_path):
+            os.remove(ots_path)
+
+
+def verify_stamp():
+    """Verifica l'ancoraggio blockchain dell'ultimo certificato"""
+    cert = load_latest_certificate()
+    if cert is None:
+        print("Nessun certificato trovato.")
+        return
+
+    cert_path = os.path.join(CERT_DIR, f"{cert['certificato']['id']}.json")
+    ots_path = cert_path + ".ots"
+
+    if not os.path.exists(ots_path):
+        print(f"File .ots non trovato: {ots_path}")
+        print("Esegui prima: python certify_vault.py --stamp")
+        return
+
+    # Leggi il file OTS
+    from opentimestamps.core.serialize import BytesDeserializationContext
+
+    with open(ots_path, "rb") as f:
+        ots_data = f.read()
+
+    # Calcola digest del certificato
+    digest = hashlib.sha256()
+    with open(cert_path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            digest.update(chunk)
+
+    print("=" * 60)
+    print("  VERIFICA ANCORAGGIO BLOCKCHAIN")
+    print("=" * 60)
+    print()
+    print(f"  Certificato: {cert['certificato']['id']}")
+    print(f"  File OTS: {os.path.basename(ots_path)}")
+    print()
+
+    # Prova a ottenere il timestamp completo dai calendari
+    print("  Richiedo la prova completa ai calendari...")
+    ctx = BytesDeserializationContext(ots_data)
+    from opentimestamps.core.timestamp import Timestamp
+    stamp = Timestamp.deserialize(ctx, digest.digest())
+
+    verified = False
+    for calendar_url in OTS_CALENDARS:
+        try:
+            calendar = RemoteCalendar(calendar_url)
+            # Cerca impegni non ancora completati
+            for commitment in stamp.all_commitments():
+                try:
+                    calendar.get_timestamp(commitment)
+                    verified = True
+                    print(f"  Impegno trovato su {calendar_url}")
+                    break
+                except KeyError:
+                    continue
+            if verified:
+                break
+        except Exception:
+            continue
+
+    if verified:
+        print()
+        print("  STATUS: IN ATTESA DI CONFERMA BLOCKCHAIN")
+        print("  Il calendario ha ricevuto la richiesta.")
+        print("  La conferma finale richiede ~1 ora.")
+        print("  Riprova piu tardi con:")
+        print("    python certify_vault.py --verify-stamp")
+    else:
+        print()
+        print("  STATUS: ANCORA NON CONFERMATO")
+        print("  Il calendario potrebbe non aver ancora")
+        print("  completato l'ancoraggio. Riprova piu tardi.")
+    print()
+
+    # Mostra info OTS
+    print(f"  Impegni: {len(list(stamp.all_commitments()))}")
+    print(f"  Timestamp interni: {len(list(stamp.all_timestamps()))}")
+
+
+# ============================================================
 # Main
 # ============================================================
 
@@ -301,6 +466,14 @@ def main():
         help="Modalita verifica: confronta i file con l'ultimo certificato"
     )
     parser.add_argument(
+        "--stamp", action="store_true",
+        help="Ancora l'ultimo certificato alla blockchain Bitcoin (Livello 3)"
+    )
+    parser.add_argument(
+        "--verify-stamp", action="store_true",
+        help="Verifica l'ancoraggio blockchain"
+    )
+    parser.add_argument(
         "--list", action="store_true",
         help="Mostra la cronologia dei certificati"
     )
@@ -310,6 +483,10 @@ def main():
         list_certificates()
     elif args.verify:
         verify_files()
+    elif args.stamp:
+        stamp_certificate()
+    elif args.verify_stamp:
+        verify_stamp()
     else:
         create_certificate()
 

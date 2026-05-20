@@ -1,0 +1,411 @@
+{
+  "vault": {
+    "nome": "Il Mio Archivio della Conoscenza",
+    "percorso": "D:\\MyBrain\\我的知识库",
+    "totale_file": 98
+  },
+  "certificato": {
+    "id": "CERT-20260520-190340",
+    "data_creazione": "2026-05-20T19:03:40.683141",
+    "timestamp": 1779296620,
+    "algoritmo": "SHA-256",
+    "root_hash": "4a2a6ce41be82ca33e70791174de6c7df7f4f7a1cc3869fbe91aedd9b90511bc",
+    "certificato_precedente_id": null,
+    "root_hash_precedente": null,
+    "lunghezza_catena": 1
+  },
+  "file": [
+    {
+      "path": "00 MOC/MOC-方向5 数字亲密关系与Streaks艺术家.md",
+      "sha256": "2e612787131c9ebd75d54370043eceff2db7922ef0084cd524e899e188c91a8a"
+    },
+    {
+      "path": "00 MOC/MOC-方向6 包浆与物质时间艺术家.md",
+      "sha256": "c52e336fa1b0cae8841d42dad11b304b88f8f8a9a3f6356ab18d10619c87bfa1"
+    },
+    {
+      "path": "00 MOC/MOC-方向7 双区参考艺术家.md",
+      "sha256": "1beb9e5c56f7676f69f7c408748a6e2d876e5c0d9392f57aab36a01272a987b7"
+    },
+    {
+      "path": "00 MOC/索引总览.md",
+      "sha256": "9b7d2e292870bc2e74f58fb3d8ea3ef2c4066df5e9754b9b34687dc56ab9a1dc"
+    },
+    {
+      "path": "01 Letteratura/Bachelard, G. - 空间诗学 (Poétique de l'Espace, 1958).md",
+      "sha256": "9ba0ba72aef410bc51120e746d4d07a715c3474b84f337169bc7d5a9154162ed"
+    },
+    {
+      "path": "01 Letteratura/Baym, N. - 数字时代的个人连接 (Personal Connections, 2010).md",
+      "sha256": "b32dfc90e598dfd02c7e4a41b9e265a5d5b9b16e31e7b2308ea7f2ae44531cc2"
+    },
+    {
+      "path": "01 Letteratura/Benjamin, W. - 灵韵与技术复制 (L'opera d'arte, 1936).md",
+      "sha256": "b40d6701b4c6d04fe75a31c79a93b5e11076484a10a2855e07f7d7889bef21e9"
+    },
+    {
+      "path": "01 Letteratura/Brandi, C. - 修复理论 (Teoria del Restauro, 1963).md",
+      "sha256": "4d924bdf7941f8cb280b807c92a0c0a3c5866dae450d920662241d533c17f179"
+    },
+    {
+      "path": "01 Letteratura/Brown, B. - 物理论 (Thing Theory, 2001).md",
+      "sha256": "6c2b9df67621338e1d9649b8cf7387b3700b20dc6f0f88822e5228f7f8ab89a8"
+    },
+    {
+      "path": "01 Letteratura/Howes, D. - 感官帝国 (Empire of the Senses, 2005).md",
+      "sha256": "ce57c069dd2f7395ae8be38ff99a43a0cd1ea44bc1cfa26b5202e2178a77bcaf"
+    },
+    {
+      "path": "01 Letteratura/Illouz, E. - 冰冷亲密关系 (Cold Intimacies, 2007).md",
+      "sha256": "74125bd7c77a6c310d95c5719402012e6e242e644c48e70f6b5c2f1adf0b9512"
+    },
+    {
+      "path": "01 Letteratura/Ingold, T. - 制作 (Making, 2013).md",
+      "sha256": "264f356bf6a720f87bbae519ef474dbd1f3186c704f6d9cd16ed4023baf813f4"
+    },
+    {
+      "path": "01 Letteratura/Krauss, R. - 扩展场域中的雕塑 (Expanded Field, 1979).md",
+      "sha256": "92268f449633a322891bc49c3e8f599beeccc26179b37f3bde3c2b528c4d84f3"
+    },
+    {
+      "path": "01 Letteratura/Marks, L. - 电影的皮肤 (The Skin of the Film, 2000).md",
+      "sha256": "4e5a742037e6a426d5c2f36fd4ff18b24d2c46f4ee8e5ad9216e6269fdb9a568"
+    },
+    {
+      "path": "01 Letteratura/Merleau-Ponty, M. - 知觉现象学 (Phénoménologie, 1945).md",
+      "sha256": "092b8d91c9b6cb35ecf4c0d95d3e0f7d7b5f0ad8e0fc258909e34601fb9f77d5"
+    },
+    {
+      "path": "01 Letteratura/Morris, R. - 雕塑笔记 (Notes on Sculpture, 1966).md",
+      "sha256": "2339e0b5f2e3074515127f05610cc76097ca7b4c3dbf28d1c2665ea8d2ed3bdf"
+    },
+    {
+      "path": "01 Letteratura/Pallasmaa, J. - 皮肤的双眼 (The Eyes of the Skin, 1996).md",
+      "sha256": "63df4701aa529567218b4f2f29252da61bddca8895bb52953c5cb0bf82e78fd7"
+    },
+    {
+      "path": "01 Letteratura/Papacharissi, Z. - 情感公众 (Affective Publics, 2014).md",
+      "sha256": "6e94ff6460728f1fc126e93bd895c3b5863e3a6ad767f33cfd8cf456c3b248b7"
+    },
+    {
+      "path": "01 Letteratura/Serra, R. - 写作与访谈 (Writings Interviews, 1994).md",
+      "sha256": "b41f766caac8f987ffaadf5abb6b257d1ed9818159c514b3a98ceb32ec93f737"
+    },
+    {
+      "path": "01 Letteratura/Settis, S. - 古代记忆 (Memoria dell'antico, 1984).md",
+      "sha256": "94e499122b26d43f0536329810e98e146edca23b07358f9eff107f74681b4954"
+    },
+    {
+      "path": "01 Letteratura/Weltevrede, E. - 应用可供性 (Apps and Their Affordances, 2021).md",
+      "sha256": "f026eaf9f58ce3cd5e66f7ce0150eda8e49dbe71b450854e858b5e799bde2ee1"
+    },
+    {
+      "path": "01 Letteratura/van Dijck, J. - 连接文化 (The Culture of Connectivity, 2013).md",
+      "sha256": "788a30471ac44386900418fd554f6823afb6ad95c5e78c81ab3e94e6b87dc2d9"
+    },
+    {
+      "path": "02 Artisti/伊娃·海瑟 (Eva Hesse).md",
+      "sha256": "68e26b8bb41a5507f68bdf47672248b6766cf951a61d6efc7abf83ac51909d88"
+    },
+    {
+      "path": "02 Artisti/克里斯蒂安·波尔坦斯基 (Christian Boltanski).md",
+      "sha256": "0ef336c68165047801309855e4c2717b1f0941eca58d288da199cb254b0c928c"
+    },
+    {
+      "path": "02 Artisti/多丽丝·萨尔塞多 (Doris Salcedo).md",
+      "sha256": "f07cec6319479a08f90d030cbd42e3390845384903bfd91fbd72b640c43d73d9"
+    },
+    {
+      "path": "02 Artisti/安塞尔姆·基弗 (Anselm Kiefer).md",
+      "sha256": "ae93216cad8a7dcc43b2d3d523929075bffa96ff81702c978e1bd68eafcce19e"
+    },
+    {
+      "path": "02 Artisti/宫岛达男 (Tatsuo Miyajima).md",
+      "sha256": "330887e0e7a23399082f5b4b43b90c1c3cda639e105766ef4bcec77b7d5a5e71"
+    },
+    {
+      "path": "02 Artisti/布鲁斯·瑙曼 (Bruce Nauman).md",
+      "sha256": "1a0862691b96520abc56f1cdfd748b823d8ad5e8675046b0d1df8e3ca9c9fbc6"
+    },
+    {
+      "path": "02 Artisti/朱塞佩·佩诺内 (Giuseppe Penone).md",
+      "sha256": "fbc99d899bacbad8fe499f9126502b3d845226fb5077173ebb4b914d5fb2dafa"
+    },
+    {
+      "path": "02 Artisti/珍妮·霍尔泽 (Jenny Holzer).md",
+      "sha256": "8a01cc8ae658c953a17738172fe28aed638c9cc2c402bf6beaa00512717e7806"
+    },
+    {
+      "path": "02 Artisti/瑞秋·怀特里德 (Rachel Whiteread).md",
+      "sha256": "db89d9783406958911b3deb9767ac2c163afbbca5c80e418038c92d4677d3327"
+    },
+    {
+      "path": "02 Artisti/科妮莉亚·帕克 (Cornelia Parker).md",
+      "sha256": "585e7f1e08fc7ba53c092cca80d71ddc40e46100932ec60923443bb2dd5ef4a9"
+    },
+    {
+      "path": "02 Artisti/翠西·艾敏 (Tracey Emin).md",
+      "sha256": "5bdbd7c46d40e7dfdf88f62768625573d32121bbbbdc93acaa19a5dedf800684"
+    },
+    {
+      "path": "02 Artisti/莫娜·哈透姆 (Mona Hatoum).md",
+      "sha256": "40d516fa914dc930ccd80d2a9e578d64ec8194e140eb1e4fbba690597f3814d3"
+    },
+    {
+      "path": "02 Artisti/菲莉达·巴洛 (Phyllida Barlow).md",
+      "sha256": "42e288e5665fb2c7b06cd0a3394c661943c09b615070c21b3e4989dd7e3e71da"
+    },
+    {
+      "path": "02 Artisti/费利克斯·冈萨雷斯-托雷斯 (Felix Gonzalez-Torres).md",
+      "sha256": "518e83d9253fc6d7a3299a6abad68b4fc7804e08396f31482e91f91903d5ea49"
+    },
+    {
+      "path": "03 Opere/Barlow - 无题 翻倒的房子2 (untitled upturnedhouse2, 2012).md",
+      "sha256": "bd45e1b326d90614f53409965e933b9d8e56d1671cac833d5d1883fdfee1547a"
+    },
+    {
+      "path": "03 Opere/Barlow - 死胡同 (cul-de-sac, 2019).md",
+      "sha256": "70ab17fbdd1f98c015c7ce9e67af1c44073427721c9d721d03c3e66b34a331a8"
+    },
+    {
+      "path": "03 Opere/Barlow - 码头 (dock, 2014).md",
+      "sha256": "b33910fc4a867bd9e81980819df61ecd721baba26269c8e0fbba74590bc5deab"
+    },
+    {
+      "path": "03 Opere/Boltanski - 库存 (Reserve, 1989).md",
+      "sha256": "0f78ad21ae31c2d4cb40831293bec273117a46709a6fa77e0dbc6cbd275293ca"
+    },
+    {
+      "path": "03 Opere/Boltanski - 心脏档案 (Les Archives du Cœur, 2010).md",
+      "sha256": "9c8c8f3a70e1f9a8a126e08f56cc08af5cc9a4a94ec5eaa2eb1398d5583bdbd6"
+    },
+    {
+      "path": "03 Opere/Boltanski - 纪念碑 (Monument, 1989).md",
+      "sha256": "8ef919afe785e38f47be12d9d39d4ffb683f3974f0315692e22c1110e81dc147"
+    },
+    {
+      "path": "03 Opere/Emin - 你忘了吻我的灵魂 (You Forgot To Kiss My Soul, 2001).md",
+      "sha256": "a1d3d95262aecc9807f32f951e2b0e03e8bb14ace21c1d2b443c3dcadca9393d"
+    },
+    {
+      "path": "03 Opere/Emin - 我想和你在一起 (I Want My Time With You, 2018).md",
+      "sha256": "2c83fcf90f21a522d68c1247750fbb85d3fa463078a0ff75ea7719ac7f85ab92"
+    },
+    {
+      "path": "03 Opere/Emin - 我的床 (My Bed, 1998).md",
+      "sha256": "c6dd717011abb3bb4bc4f8ab8c05f857f8bbf076c9b64fe40259430b4b00a34b"
+    },
+    {
+      "path": "03 Opere/Gonzalez-Torres - 完美情侣 (Perfect Lovers, 1987-1990).md",
+      "sha256": "c0a59ceb3918eac600eb8779ccb4efa07eabb9881e3e0fd79da4aa5d3bf82b95"
+    },
+    {
+      "path": "03 Opere/Gonzalez-Torres - 罗斯的肖像 (Portrait of Ross, 1991).md",
+      "sha256": "2a0aef56f0f06df0fd4023ee58ad168162e488fd0b146f45265a058ba2f4a272"
+    },
+    {
+      "path": "03 Opere/Gonzalez-Torres - 美国3号 (America 3, 1992).md",
+      "sha256": "b3fd07ce973d3329b2337721e425810a4f9bae3e3fe6eca7e2bada02f024824d"
+    },
+    {
+      "path": "03 Opere/Hatoum - 家庭束缚 (Homebound, 2000).md",
+      "sha256": "801cf27f4febf8e4a863105a03ff4c05d5a2678f266adf85c3971fa7a23bb85c"
+    },
+    {
+      "path": "03 Opere/Hatoum - 热点 (Hot Spot, 2006).md",
+      "sha256": "aedcd52ff23a8ff6fe5a6326e9ad58b6f84f87bdcf5fad7407b08da18feb6afc"
+    },
+    {
+      "path": "03 Opere/Hatoum - 距离的尺度 (Measures of Distance, 1988).md",
+      "sha256": "98fc5cf3fcae4d35d347947617a8933986a50f834ddca12b7b189eb7e9339896"
+    },
+    {
+      "path": "03 Opere/Hesse - 偶然 (Contingent, 1969).md",
+      "sha256": "81c9fa24648762a61affca7b8c5d8e57d210d59ab81c7f1273e857983a6e45d7"
+    },
+    {
+      "path": "03 Opere/Hesse - 无题II (Sans II, 1968).md",
+      "sha256": "1e3088901ef0e64997141a46a192b6fbe1c7c8d0ecbc4d65b85c049a8245a409"
+    },
+    {
+      "path": "03 Opere/Hesse - 重复十九III (Repetition Nineteen III, 1968).md",
+      "sha256": "c767c7e74051c4ca6571a232ed23be613bc5b0b90557d8de20756bab191e75e1"
+    },
+    {
+      "path": "03 Opere/Holzer - 为城市 (For the City, 2005).md",
+      "sha256": "06747d50b9f2966a4d356b1d6f8d6ef39b4c7aef81aa3792e630c9b0bf43e350"
+    },
+    {
+      "path": "03 Opere/Holzer - 格言 (Truisms, 1977-79).md",
+      "sha256": "8002be0a07b4f84de6859c2f5bf72b6e6656adeb0c4205389254f35f6388a115"
+    },
+    {
+      "path": "03 Opere/Holzer - 生存系列 (Survival Series, 1983-85).md",
+      "sha256": "5f698b2f41225c0c10b6459d667d3e6c0bc18a52daacaa9e00d7fb92b6e02717"
+    },
+    {
+      "path": "03 Opere/Kiefer - 新月沃地 (The Fertile Crescent, 2009).md",
+      "sha256": "8da2c526b10aa33728ec63515e6729dfe518a8015cba57b3e85d5cbea5dea241"
+    },
+    {
+      "path": "03 Opere/Kiefer - 玛格丽特 (Margarete, 1981).md",
+      "sha256": "b95db6ebe1d730643aa7f4657c96a0b0cbde4dec4f0a9f558bdbb59df15928dc"
+    },
+    {
+      "path": "03 Opere/Kiefer - 革命中的女性 (The Women of the Revolution, 1992).md",
+      "sha256": "dd77bb5f2fa454686fecb2dd34a913026dfe450ac0788e19f06996f1032c7798"
+    },
+    {
+      "path": "03 Opere/Miyajima - 巨型死亡 (Mega Death, 1999).md",
+      "sha256": "4dff621e0d1e9fde64896f33d2eb9d7a309130ada294cf3e6f0bb44f530e023d"
+    },
+    {
+      "path": "03 Opere/Miyajima - 时间之海 (Sea of Time, 1998).md",
+      "sha256": "36b300a2b4224ea8eeaa7ea322bedbbd541b86f1650904d64a3adeba5dfbd157"
+    },
+    {
+      "path": "03 Opere/Miyajima - 计数之音 (Counter Voice, 2009).md",
+      "sha256": "adbef56925d0d96dba4e889bab25a4e4951026a6c083630536cfa25394b0460c"
+    },
+    {
+      "path": "03 Opere/Nauman - 作为喷泉的自画像 (Self-Portrait as a Fountain, 1966).md",
+      "sha256": "7fb8fc6c19fae4656b2e0b8d2964d50b40f86cc9ec30314c7fabaae0b4720f2b"
+    },
+    {
+      "path": "03 Opere/Nauman - 小提琴 暴力 沉默 (Violins Violence Silence, 1981).md",
+      "sha256": "67e61a7f33c80ce05e65d32c5e84f59621f1602bad830c495737bd4dd3a7393b"
+    },
+    {
+      "path": "03 Opere/Nauman - 真正的艺术家帮助世界揭示神秘真理 (The True Artist Helps the World, 1967).md",
+      "sha256": "f5533768f3bc619825e797f41a2ed4c4ecf6963e2fb388786da66ac618385cf5"
+    },
+    {
+      "path": "03 Opere/Parker - 三十块银币 (Thirty Pieces of Silver, 1988).md",
+      "sha256": "2fc6fd404c0f796bf47165701e567f303b039cc9b229693fe78f35e0fc7df94f"
+    },
+    {
+      "path": "03 Opere/Parker - 乌鸦群 (Mass of Crows, 2017).md",
+      "sha256": "7865e67c0a459ea0021985b931c6dc4c365d2f515df13eddf754e38c6e28e0db"
+    },
+    {
+      "path": "03 Opere/Parker - 冷暗物质 爆炸视图 (Cold Dark Matter, 1991).md",
+      "sha256": "ad4a44683be3da01737f500a52293c6ec7396b3bbfd87d1d2f2d3082ee86edbe"
+    },
+    {
+      "path": "03 Opere/Penone - 成为河流 (Essere Fiume, 1981).md",
+      "sha256": "fda16d16843c06854602bf5c0048780536e2aec321ec6b03708587833679646d"
+    },
+    {
+      "path": "03 Opere/Penone - 树 (Albero, 1969).md",
+      "sha256": "946494064b208428f181248ef164b5c1d42ac4dc832cf1e96f463fa9bdaaf210"
+    },
+    {
+      "path": "03 Opere/Penone - 除了那一点它将继续生长 (Continuerà a crescere, 1968).md",
+      "sha256": "a53770da698748ef606a9ff501427dd0dee191ba180364f9b28c16a83e253785"
+    },
+    {
+      "path": "03 Opere/Salcedo - 无声的祈祷 (Plegaria Muda, 2010).md",
+      "sha256": "f3edf55c5d30bdabb9ae98bba85379830312c972879383ff5da9c7f77a953ea8"
+    },
+    {
+      "path": "03 Opere/Salcedo - 示播列 (Shibboleth, 2007).md",
+      "sha256": "74c7e46866ad1e5dbe6c795473b488372efc2ce8a7d6e280fd4f2c3facc3011a"
+    },
+    {
+      "path": "03 Opere/Salcedo - 苦胆 (Atrabiliarios, 1990s).md",
+      "sha256": "d8cb73482f0a773a68c6985f769c6f1a906f62454f1901e3edc75fb78575b3be"
+    },
+    {
+      "path": "03 Opere/Whiteread - 幽灵 (Ghost, 1990).md",
+      "sha256": "cf4eb6320f66d5ec9e7368c7840d9c1a2b989b8a6e592fd4a7c7dc4eb8352ac6"
+    },
+    {
+      "path": "03 Opere/Whiteread - 房子 (House, 1993).md",
+      "sha256": "aa96e0571256e021be28a1da9225c233af3289f84d150d3b5fb52bd68b4037d6"
+    },
+    {
+      "path": "03 Opere/Whiteread - 无题 一百个空间 (Untitled One Hundred Spaces, 1995).md",
+      "sha256": "7815e3418389551bcfbabdccd6a3846e0c2b8c26df45d831e01b5da51e0e53f6"
+    },
+    {
+      "path": "04 Concetti/关系劳动 (Relational labor).md",
+      "sha256": "3b388c68bcdc1296ede0a075551b67db069a15135f7a318cbf0eafd075b405b4"
+    },
+    {
+      "path": "04 Concetti/具身感知 (Embodied perception).md",
+      "sha256": "a474d3a2884eb5feff9f77930f00384233346f02b8ace8ccc0cb22081491fdc0"
+    },
+    {
+      "path": "04 Concetti/包浆关系 (Patina as relation).md",
+      "sha256": "d05775fe4970781688c13e41532382cb1d3b50fea70fc3426ff9ef1efd07c555"
+    },
+    {
+      "path": "04 Concetti/平台情感 (Platform affect).md",
+      "sha256": "3778e20159ac0b8868bdcd86a83b4a832e0e9ec1bb1fa82e27ffe9c89349496d"
+    },
+    {
+      "path": "04 Concetti/感官人类学 (Sensory anthropology).md",
+      "sha256": "c206722c45f95806c383127419462e2ef1f7a227025bc0a85ff6bfca4f00f288"
+    },
+    {
+      "path": "04 Concetti/扩展场域 (Expanded field).md",
+      "sha256": "5414c676526845938eb16cfe6eb8babb8b7ad986ccd9bd799263c6ef634cd2e4"
+    },
+    {
+      "path": "04 Concetti/火焰逻辑 (Streaks logic).md",
+      "sha256": "cd2831eaa8b2206436ba97df2bafdf2a6dae681a74caee907f24bd1473675422"
+    },
+    {
+      "path": "04 Concetti/灵韵 (Aura).md",
+      "sha256": "d53c72f55f36697a64da650b79a18f15197ca689330b03cae722e55121007323"
+    },
+    {
+      "path": "04 Concetti/物理论 (Thing Theory).md",
+      "sha256": "f4c6a71aec9b4203cfb4e765007da5ccb868830b392ec4b79d14a06090ad91d9"
+    },
+    {
+      "path": "04 Concetti/物质记忆 (Material memory).md",
+      "sha256": "f69b0408bd0a95ae1249956c12420e66f1e7144c8a43567c537950f00ce27c91"
+    },
+    {
+      "path": "04 Concetti/网络亲密关系 (Networked intimacy).md",
+      "sha256": "23342bb0f0a9a970cf92f1e1de393ad55409856b76ec082cf673004a292877d3"
+    },
+    {
+      "path": "04 Concetti/触觉视觉性 (Haptic visuality).md",
+      "sha256": "4a54b415b6a6532c0731ea93b010899070c5b311d7fe014246be25699e469924"
+    },
+    {
+      "path": "04 Concetti/连通性 vs 社区 (Connectivity vs community).md",
+      "sha256": "5aeef2d9addd5d13e7ca8a95ed6b624a83807cb5c2652d9249cb2fedf40dea4e"
+    },
+    {
+      "path": "04 Concetti/雕塑现象学 (Phenomenology of sculpture).md",
+      "sha256": "f7cb490be3285a44e3fb95a6af2aa5ab810530c4ec87fe9fee7eeb8cd18ff9e6"
+    },
+    {
+      "path": "05 Citazioni/README.md",
+      "sha256": "e255c73c5bd08ffe791a18ed26b58eded66b8140d2194a49ebc06585b8862a83"
+    },
+    {
+      "path": "05 Citazioni/_模板 引文.md",
+      "sha256": "23059f970704a18f9592e7cbe9a3d7cfd09db9ec84118f9471cd6b2e2e7ca7d3"
+    },
+    {
+      "path": "_修复报告.md",
+      "sha256": "7063c61e7084640d0041451e1252c1c2416ec9746337bda6450152c197c5f657"
+    },
+    {
+      "path": "【方案】毕业论文知识库搭建计划.md",
+      "sha256": "5cb1655917e0718365570cb7f0ebf93dbdbaf397204d03d606d3ea0f771fc335"
+    },
+    {
+      "path": "【计划】检索执行计划.md",
+      "sha256": "2d112ec5a06b71908d84adebe87355038555c3480945ff7ff18adc692d253c46"
+    },
+    {
+      "path": "欢迎！.md",
+      "sha256": "57516063de92e63bbff8d0b5f6544b68236563d0eb81d754dd50bbefbbe0fce5"
+    }
+  ]
+}
