@@ -1,0 +1,11 @@
+# Certificates (generated at runtime)
+_certificates/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
