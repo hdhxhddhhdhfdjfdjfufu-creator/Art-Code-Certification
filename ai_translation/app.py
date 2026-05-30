@@ -1,13 +1,19 @@
 import json
 import os
+from pathlib import Path
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from openai import AsyncOpenAI
 
+# Resolve paths relative to this file so they work regardless of cwd
+BASE_DIR    = Path(__file__).parent
+STATIC_DIR  = BASE_DIR / "static"
+INDEX_HTML  = STATIC_DIR / "index.html"
+
 app = FastAPI(title="AI Sync Translation")
-app.mount("/static", StaticFiles(directory="ai_translation/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 client = AsyncOpenAI(
     api_key=os.environ.get("DEEPSEEK_API_KEY", ""),
@@ -31,8 +37,7 @@ LANGUAGES = {
 
 @app.get("/")
 async def root():
-    with open("ai_translation/static/index.html", encoding="utf-8") as f:
-        return HTMLResponse(f.read())
+    return HTMLResponse(INDEX_HTML.read_text(encoding="utf-8"))
 
 
 @app.websocket("/ws/translate")
