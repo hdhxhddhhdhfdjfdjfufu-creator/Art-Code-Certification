@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 同步翻译</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d1a;
+      --surface: #13132a;
+      --surface2: #1a1a38;
+      --border: #2a2a50;
+      --text: #e0e0f0;
+      --muted: #7070a0;
+      --accent: #5b8fff;
+      --accent2: #a78bfa;
+      --danger: #ff5555;
+      --success: #50fa7b;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo { font-size: 1.5rem; }
+    .header-text h1 { font-size: 1.1rem; font-weight: 700; }
+    .header-text p  { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    .ws-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .ws-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    .ws-dot.on { background: var(--success); box-shadow: 0 0 6px var(--success); }
+
+    /* ── Language bar ── */
+    .lang-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .lang-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    select:focus { border-color: var(--accent); }
+
+    .swap-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .swap-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    .auto-tts-label {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .auto-tts-label input { accent-color: var(--accent); }
+
+    /* ── Main panels ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    .panel {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .panel:last-child { border-right: none; }
+
+    .panel-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .text-box {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      font-size: 1.05rem;
+      line-height: 1.85;
+      overflow-y: auto;
+      min-height: 220px;
+      transition: border-color 0.2s;
+      word-break: break-word;
+    }
+    .text-box.active { border-color: var(--accent); }
+    .text-box.translating { border-color: var(--accent2); }
+
+    .placeholder-text { color: #3a3a60; font-style: italic; font-size: 0.95rem; }
+
+    .interim-text { color: var(--muted); font-style: italic; }
+
+    .cursor {
+      display: inline-block;
+      width: 2px; height: 1.1em;
+      background: var(--accent2);
+      border-radius: 1px;
+      vertical-align: text-bottom;
+      animation: blink 0.65s step-end infinite;
+      margin-left: 1px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── History ── */
+    .history-wrap {
+      border-top: 1px solid var(--border);
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+    }
+    .history-header {
+      padding: 0.6rem 1.5rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+    }
+    .history-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      padding: 0.6rem 1.5rem;
+      font-size: 0.875rem;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .history-item:hover { background: var(--surface); }
+    .h-orig { color: var(--muted); }
+    .h-trans { color: var(--accent); }
+
+    /* ── Footer / controls ── */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .recording-badge {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--danger);
+    }
+    .recording-badge.show { display: flex; }
+    .rec-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--danger);
+      animation: pulse 1.1s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    .btn {
+      padding: 0.6rem 1.4rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+    .btn:not(:disabled):hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:not(:disabled):active { transform: translateY(0); }
+
+    .btn-start  { background: linear-gradient(135deg, #5b8fff, #a78bfa); color: #fff; }
+    .btn-stop   { background: linear-gradient(135deg, #ff5555, #ff8080); color: #fff; display: none; }
+    .btn-speak  { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+    .btn-clear  { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); margin-left: auto; }
+
+    /* ── Error banner ── */
+    .error-bar {
+      background: #2a0a0a;
+      border-top: 1px solid #5a1a1a;
+      color: #ff8080;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.83rem;
+      display: none;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      main { grid-template-columns: 1fr; }
+      .panel { border-right: none; border-bottom: 1px solid var(--border); }
+      .history-item { grid-template-columns: 1fr; gap: 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🌐</div>
+  <div class="header-text">
+    <h1>AI 同步翻译</h1>
+    <p>实时语音识别 · DeepSeek 流式翻译 · TTS 语音播报</p>
+  </div>
+  <div class="ws-badge">
+    <div class="ws-dot" id="wsDot"></div>
+    <span id="wsLabel">连接中…</span>
+  </div>
+</header>
+
+<div class="lang-bar">
+  <div class="lang-group">
+    <span>识别语言</span>
+    <select id="sourceLang">
+      <option value="zh-CN">中文</option>
+      <option value="en-US" selected>English</option>
+      <option value="ja-JP">日本語</option>
+      <option value="ko-KR">한국어</option>
+      <option value="fr-FR">Français</option>
+      <option value="de-DE">Deutsch</option>
+      <option value="es-ES">Español</option>
+      <option value="it-IT">Italiano</option>
+      <option value="ru-RU">Русский</option>
+    </select>
+  </div>
+
+  <button class="swap-btn" id="swapBtn" title="交换语言">⇄</button>
+
+  <div class="lang-group">
+    <span>翻译目标</span>
+    <select id="targetLang">
+      <option value="zh">中文</option>
+      <option value="en">English</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="es">Español</option>
+      <option value="it">Italiano</option>
+      <option value="ru">Русский</option>
+    </select>
+  </div>
+
+  <label class="auto-tts-label">
+    <input type="checkbox" id="autoTTS" /> 自动朗读
+  </label>
+</div>
+
+<main>
+  <div class="panel">
+    <div class="panel-label">原文 (语音识别)</div>
+    <div class="text-box" id="sourceBox">
+      <span class="placeholder-text">点击"开始录音"后，讲话内容会实时显示在这里…</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">译文 (AI 翻译)</div>
+    <div class="text-box" id="translationBox">
+      <span class="placeholder-text">翻译结果将在这里流式输出…</span>
+    </div>
+  </div>
+</main>
+
+<div class="error-bar" id="errorBar"></div>
+
+<div class="history-wrap" id="historyWrap">
+  <div class="history-header">翻译历史</div>
+  <div id="historyList"></div>
+</div>
+
+<footer>
+  <div class="recording-badge" id="recBadge">
+    <div class="rec-dot"></div> 录音中
+  </div>
+  <button class="btn btn-start" id="startBtn">🎤 开始录音</button>
+  <button class="btn btn-stop"  id="stopBtn" >⏹ 停止录音</button>
+  <button class="btn btn-speak" id="speakBtn">🔊 朗读译文</button>
+  <button class="btn btn-clear" id="clearBtn">清空</button>
+</footer>
+
+<script>
+  const WS_URL = `ws://${location.host}/ws/translate`;
+
+  // ── State ──
+  let ws = null;
+  let recognition = null;
+  let currentTranslation = "";
+  let isRecording = false;
+
+  // ── Elements ──
+  const wsDot       = document.getElementById('wsDot');
+  const wsLabel     = document.getElementById('wsLabel');
+  const sourceBox   = document.getElementById('sourceBox');
+  const transBox    = document.getElementById('translationBox');
+  const errorBar    = document.getElementById('errorBar');
+  const recBadge    = document.getElementById('recBadge');
+  const startBtn    = document.getElementById('startBtn');
+  const stopBtn     = document.getElementById('stopBtn');
+  const speakBtn    = document.getElementById('speakBtn');
+  const clearBtn    = document.getElementById('clearBtn');
+  const historyWrap = document.getElementById('historyWrap');
+  const historyList = document.getElementById('historyList');
+  const swapBtn     = document.getElementById('swapBtn');
+  const autoTTS     = document.getElementById('autoTTS');
+  const sourceLang  = document.getElementById('sourceLang');
+  const targetLang  = document.getElementById('targetLang');
+
+  // ── WebSocket ──
+  function connectWS() {
+    ws = new WebSocket(WS_URL);
+
+    ws.onopen = () => {
+      wsDot.classList.add('on');
+      wsLabel.textContent = '已连接';
+    };
+    ws.onclose = () => {
+      wsDot.classList.remove('on');
+      wsLabel.textContent = '重连中…';
+      setTimeout(connectWS, 2500);
+    };
+    ws.onerror = () => showError('WebSocket 连接失败，请确认后端已启动 (uvicorn ai_translation.app:app)');
+    ws.onmessage = (e) => handleMsg(JSON.parse(e.data));
+  }
+
+  function handleMsg(msg) {
+    if (msg.type === 'chunk') {
+      // Clear placeholder on first chunk
+      if (transBox.querySelector('.placeholder-text')) transBox.innerHTML = '';
+      removeCursor();
+      transBox.appendChild(document.createTextNode(msg.content));
+      transBox.appendChild(makeCursor());
+      currentTranslation = transBox.textContent;
+      transBox.classList.add('translating');
+
+    } else if (msg.type === 'done') {
+      removeCursor();
+      transBox.classList.remove('translating');
+      currentTranslation = msg.translation;
+      addHistory(msg.original, msg.translation);
+      if (autoTTS.checked) speak(msg.translation);
+
+    } else if (msg.type === 'error') {
+      showError('翻译错误：' + msg.message);
+      transBox.classList.remove('translating');
+    }
+  }
+
+  function makeCursor() {
+    const c = document.createElement('span');
+    c.className = 'cursor';
+    return c;
+  }
+  function removeCursor() {
+    transBox.querySelector('.cursor')?.remove();
+  }
+
+  // ── Speech Recognition ──
+  function initRecognition() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      showError('浏览器不支持语音识别，请使用 Chrome 或 Edge');
+      return false;
+    }
+
+    recognition = new SR();
+    recognition.continuous    = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let interim = '';
+      let final_  = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        event.results[i].isFinal ? (final_ += t) : (interim += t);
+      }
+
+      if (sourceBox.querySelector('.placeholder-text')) sourceBox.innerHTML = '';
+
+      // Update interim span
+      let interimEl = sourceBox.querySelector('.interim-text');
+      if (interim) {
+        if (!interimEl) {
+          interimEl = document.createElement('span');
+          interimEl.className = 'interim-text';
+          sourceBox.appendChild(interimEl);
+        }
+        interimEl.textContent = interim;
+      } else if (interimEl) {
+        interimEl.remove();
+      }
+
+      if (final_) {
+        // Remove interim, append final as paragraph
+        sourceBox.querySelector('.interim-text')?.remove();
+        const p = document.createElement('p');
+        p.textContent = final_;
+        sourceBox.appendChild(p);
+
+        // Send for translation
+        sendTranslate(final_);
+      }
+    };
+
+    recognition.onerror = (e) => {
+      if (e.error !== 'no-speech') showError('语音识别错误：' + e.error);
+    };
+
+    // Auto-restart keeps listening continuously
+    recognition.onend = () => {
+      if (isRecording) recognition.start();
+    };
+
+    return true;
+  }
+
+  function sendTranslate(text) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      showError('WebSocket 未连接，请稍后重试');
+      return;
+    }
+    // Clear translation box for new sentence
+    transBox.innerHTML = '';
+    currentTranslation = '';
+    ws.send(JSON.stringify({ text, target_lang: targetLang.value }));
+  }
+
+  // ── Buttons ──
+  startBtn.addEventListener('click', () => {
+    if (!recognition && !initRecognition()) return;
+    hideError();
+    recognition.lang = sourceLang.value;
+    recognition.start();
+    isRecording = true;
+    startBtn.style.display = 'none';
+    stopBtn.style.display  = 'inline-block';
+    recBadge.classList.add('show');
+    sourceBox.classList.add('active');
+  });
+
+  stopBtn.addEventListener('click', () => {
+    isRecording = false;
+    recognition?.stop();
+    startBtn.style.display = 'inline-block';
+    stopBtn.style.display  = 'none';
+    recBadge.classList.remove('show');
+    sourceBox.classList.remove('active');
+  });
+
+  speakBtn.addEventListener('click', () => {
+    if (currentTranslation) speak(currentTranslation);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    sourceBox.innerHTML   = '<span class="placeholder-text">点击"开始录音"后，讲话内容会实时显示在这里…</span>';
+    transBox.innerHTML    = '<span class="placeholder-text">翻译结果将在这里流式输出…</span>';
+    transBox.classList.remove('translating');
+    historyWrap.style.display = 'none';
+    historyList.innerHTML = '';
+    currentTranslation = '';
+    speechSynthesis.cancel();
+  });
+
+  // Swap source/target language display
+  swapBtn.addEventListener('click', () => {
+    const srcVal = sourceLang.value.split('-')[0].toLowerCase();
+    const tgtVal = targetLang.value;
+
+    // Map speech lang code → translate code
+    const speechToTranslate = { zh: 'zh', en: 'en', ja: 'ja', ko: 'ko', fr: 'fr', de: 'de', es: 'es', it: 'it', ru: 'ru' };
+    // Map translate code → speech lang code
+    const translateToSpeech = { zh: 'zh-CN', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR', fr: 'fr-FR', de: 'de-DE', es: 'es-ES', it: 'it-IT', ru: 'ru-RU' };
+
+    const newSpeech = translateToSpeech[tgtVal] || 'zh-CN';
+    const newTarget = speechToTranslate[srcVal] || 'zh';
+
+    // Set select values
+    for (const opt of sourceLang.options) {
+      if (opt.value === newSpeech) { opt.selected = true; break; }
+    }
+    for (const opt of targetLang.options) {
+      if (opt.value === newTarget) { opt.selected = true; break; }
+    }
+  });
+
+  // ── TTS ──
+  const ttsLangMap = {
+    zh: 'zh-CN', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR',
+    fr: 'fr-FR', de: 'de-DE', es: 'es-ES', it: 'it-IT', ru: 'ru-RU',
+  };
+
+  function speak(text) {
+    speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = ttsLangMap[targetLang.value] || 'zh-CN';
+    utt.rate = 0.95;
+    speechSynthesis.speak(utt);
+  }
+
+  // ── History ──
+  function addHistory(orig, trans) {
+    historyWrap.style.display = 'block';
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `<div class="h-orig">${esc(orig)}</div><div class="h-trans">${esc(trans)}</div>`;
+    historyList.insertBefore(item, historyList.firstChild);
+    // Cap at 30 entries
+    while (historyList.children.length > 30) historyList.removeChild(historyList.lastChild);
+  }
+
+  function esc(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // ── Error ──
+  function showError(msg) {
+    errorBar.textContent = '⚠ ' + msg;
+    errorBar.style.display = 'block';
+  }
+  function hideError() {
+    errorBar.style.display = 'none';
+  }
+
+  // ── Init ──
+  connectWS();
+</script>
+
+</body>
+</html>
