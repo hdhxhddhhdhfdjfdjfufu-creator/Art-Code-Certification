@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>AI 同步翻译</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,31 +24,36 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      /* Prevent iOS bounce on scroll */
+      overscroll-behavior: none;
     }
 
     /* ── Header ── */
     header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      padding: 1rem 1.25rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
+      /* iOS safe area */
+      padding-top: max(1rem, env(safe-area-inset-top));
     }
-    .logo { font-size: 1.5rem; }
-    .header-text h1 { font-size: 1.1rem; font-weight: 700; }
-    .header-text p  { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .logo { font-size: 1.4rem; flex-shrink: 0; }
+    .header-text h1 { font-size: 1rem; font-weight: 700; }
+    .header-text p  { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
 
     .ws-badge {
       margin-left: auto;
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--muted);
+      flex-shrink: 0;
     }
     .ws-dot {
       width: 8px; height: 8px;
@@ -58,33 +63,45 @@
     }
     .ws-dot.on { background: var(--success); box-shadow: 0 0 6px var(--success); }
 
+    /* ── Alert banner ── */
+    .alert {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.8rem;
+      display: none;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .alert.warn { background: #1a1400; border-bottom: 1px solid #3a3000; color: #ffd060; display: flex; }
+    .alert.err  { background: #1a0808; border-bottom: 1px solid #3a1010; color: #ff8080; display: flex; }
+
     /* ── Language bar ── */
     .lang-bar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 0.6rem 1.5rem;
+      padding: 0.55rem 1.25rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
     }
     .lang-group {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
+      gap: 0.4rem;
+      font-size: 0.78rem;
       color: var(--muted);
     }
     select {
       background: var(--surface2);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.35rem 0.7rem;
+      padding: 0.35rem 0.6rem;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
       outline: none;
-      transition: border-color 0.2s;
+      /* Prevent iOS zoom on focus */
+      font-size: max(0.82rem, 16px);
     }
     select:focus { border-color: var(--accent); }
 
@@ -97,20 +114,21 @@
       cursor: pointer;
       font-size: 1rem;
       display: flex; align-items: center; justify-content: center;
-      transition: color 0.2s, border-color 0.2s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .swap-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .swap-btn:active { background: var(--border); }
 
     .auto-tts-label {
       margin-left: auto;
       display: flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--muted);
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
-    .auto-tts-label input { accent-color: var(--accent); }
+    .auto-tts-label input { accent-color: var(--accent); width: 16px; height: 16px; }
 
     /* ── Main panels ── */
     main {
@@ -121,21 +139,23 @@
     }
 
     .panel {
-      padding: 1.25rem 1.5rem;
+      padding: 1rem 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.6rem;
       border-right: 1px solid var(--border);
       overflow: hidden;
+      min-height: 0;
     }
     .panel:last-child { border-right: none; }
 
     .panel-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       color: var(--muted);
+      flex-shrink: 0;
     }
 
     .text-box {
@@ -143,24 +163,24 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 1.25rem;
-      font-size: 1.05rem;
-      line-height: 1.85;
+      padding: 1rem;
+      font-size: 1rem;
+      line-height: 1.8;
       overflow-y: auto;
-      min-height: 220px;
+      min-height: 160px;
       transition: border-color 0.2s;
       word-break: break-word;
+      -webkit-overflow-scrolling: touch;
     }
-    .text-box.active { border-color: var(--accent); }
+    .text-box.active     { border-color: var(--accent); }
     .text-box.translating { border-color: var(--accent2); }
 
-    .placeholder-text { color: #3a3a60; font-style: italic; font-size: 0.95rem; }
-
-    .interim-text { color: var(--muted); font-style: italic; }
+    .placeholder-text { color: #3a3a60; font-style: italic; font-size: 0.9rem; }
+    .interim-text     { color: var(--muted); font-style: italic; }
 
     .cursor {
       display: inline-block;
-      width: 2px; height: 1.1em;
+      width: 2px; height: 1em;
       background: var(--accent2);
       border-radius: 1px;
       vertical-align: text-bottom;
@@ -169,16 +189,49 @@
     }
     @keyframes blink { 50% { opacity: 0; } }
 
+    /* ── Text input fallback ── */
+    .text-input-wrap {
+      display: none;
+      gap: 0.5rem;
+      align-items: stretch;
+    }
+    .text-input-wrap.show { display: flex; }
+    .manual-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      font-size: 16px; /* Prevent iOS zoom */
+      resize: none;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+    .manual-input:focus { outline: none; border-color: var(--accent); }
+    .send-btn {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .send-btn:active { opacity: 0.8; }
+
     /* ── History ── */
     .history-wrap {
       border-top: 1px solid var(--border);
-      max-height: 180px;
+      max-height: 160px;
       overflow-y: auto;
       display: none;
+      -webkit-overflow-scrolling: touch;
     }
     .history-header {
-      padding: 0.6rem 1.5rem;
-      font-size: 0.7rem;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -190,38 +243,37 @@
     .history-item {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      padding: 0.6rem 1.5rem;
-      font-size: 0.875rem;
+      gap: 0.75rem;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.85rem;
       border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
     }
-    .history-item:hover { background: var(--surface); }
     .h-orig { color: var(--muted); }
     .h-trans { color: var(--accent); }
 
-    /* ── Footer / controls ── */
+    /* ── Footer ── */
     footer {
       background: var(--surface);
       border-top: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      padding: 0.85rem 1.25rem;
+      padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.6rem;
       flex-wrap: wrap;
     }
 
     .recording-badge {
       display: none;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
+      gap: 0.4rem;
+      font-size: 0.78rem;
       font-weight: 600;
       color: var(--danger);
     }
     .recording-badge.show { display: flex; }
     .rec-dot {
-      width: 9px; height: 9px;
+      width: 8px; height: 8px;
       border-radius: 50%;
       background: var(--danger);
       animation: pulse 1.1s ease-in-out infinite;
@@ -232,38 +284,39 @@
     }
 
     .btn {
-      padding: 0.6rem 1.4rem;
-      border-radius: 8px;
+      padding: 0.65rem 1.2rem;
+      border-radius: 9px;
       border: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.15s, transform 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      /* Large enough tap target for touch */
+      min-height: 44px;
     }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-    .btn:not(:disabled):hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn:not(:disabled):active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn:not(:disabled):active { opacity: 0.8; transform: scale(0.97); }
 
     .btn-start  { background: linear-gradient(135deg, #5b8fff, #a78bfa); color: #fff; }
     .btn-stop   { background: linear-gradient(135deg, #ff5555, #ff8080); color: #fff; display: none; }
     .btn-speak  { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
     .btn-clear  { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); margin-left: auto; }
 
-    /* ── Error banner ── */
-    .error-bar {
-      background: #2a0a0a;
-      border-top: 1px solid #5a1a1a;
-      color: #ff8080;
-      padding: 0.5rem 1.5rem;
-      font-size: 0.83rem;
+    /* ── iOS-specific tip ── */
+    .ios-tip {
+      background: #0a1a0a;
+      border-bottom: 1px solid #1a3a1a;
+      color: #80c080;
+      padding: 0.55rem 1.25rem;
+      font-size: 0.78rem;
       display: none;
     }
 
-    /* ── Responsive ── */
-    @media (max-width: 680px) {
+    /* ── Responsive: stack on small screens ── */
+    @media (max-width: 600px) {
       main { grid-template-columns: 1fr; }
-      .panel { border-right: none; border-bottom: 1px solid var(--border); }
-      .history-item { grid-template-columns: 1fr; gap: 0.25rem; }
+      .panel { border-right: none; border-bottom: 1px solid var(--border); min-height: 140px; }
+      .history-item { grid-template-columns: 1fr; gap: 0.2rem; }
     }
   </style>
 </head>
@@ -273,17 +326,30 @@
   <div class="logo">🌐</div>
   <div class="header-text">
     <h1>AI 同步翻译</h1>
-    <p>实时语音识别 · DeepSeek 流式翻译 · TTS 语音播报</p>
+    <p>实时语音 · DeepSeek 流式翻译 · TTS 播报</p>
   </div>
   <div class="ws-badge">
     <div class="ws-dot" id="wsDot"></div>
-    <span id="wsLabel">连接中…</span>
+    <span id="wsLabel">连接中</span>
   </div>
 </header>
 
+<!-- iOS / HTTPS warning -->
+<div class="alert warn" id="httpsWarn">
+  ⚠️ 麦克风需要 HTTPS。请通过 https:// 访问，或在本地 localhost 运行。
+</div>
+
+<!-- iOS tip -->
+<div class="ios-tip" id="iosTip">
+  📱 iPad 模式：每句话结束后自动识别，请讲完一句再停顿。
+</div>
+
+<!-- Error bar -->
+<div class="alert err" id="errorBar"></div>
+
 <div class="lang-bar">
   <div class="lang-group">
-    <span>识别语言</span>
+    <span>识别</span>
     <select id="sourceLang">
       <option value="zh-CN">中文</option>
       <option value="en-US" selected>English</option>
@@ -300,7 +366,7 @@
   <button class="swap-btn" id="swapBtn" title="交换语言">⇄</button>
 
   <div class="lang-group">
-    <span>翻译目标</span>
+    <span>译文</span>
     <select id="targetLang">
       <option value="zh">中文</option>
       <option value="en">English</option>
@@ -321,21 +387,24 @@
 
 <main>
   <div class="panel">
-    <div class="panel-label">原文 (语音识别)</div>
+    <div class="panel-label">原文（语音识别）</div>
     <div class="text-box" id="sourceBox">
-      <span class="placeholder-text">点击"开始录音"后，讲话内容会实时显示在这里…</span>
+      <span class="placeholder-text">点击"开始录音"后开始说话…</span>
+    </div>
+    <!-- Text input fallback -->
+    <div class="text-input-wrap" id="textInputWrap">
+      <textarea class="manual-input" id="manualInput" rows="2" placeholder="或直接输入文字…"></textarea>
+      <button class="send-btn" id="sendTextBtn">↑</button>
     </div>
   </div>
 
   <div class="panel">
-    <div class="panel-label">译文 (AI 翻译)</div>
+    <div class="panel-label">译文（AI 翻译）</div>
     <div class="text-box" id="translationBox">
-      <span class="placeholder-text">翻译结果将在这里流式输出…</span>
+      <span class="placeholder-text">翻译结果将在这里流式显示…</span>
     </div>
   </div>
 </main>
-
-<div class="error-bar" id="errorBar"></div>
 
 <div class="history-wrap" id="historyWrap">
   <div class="history-header">翻译历史</div>
@@ -343,76 +412,80 @@
 </div>
 
 <footer>
-  <div class="recording-badge" id="recBadge">
-    <div class="rec-dot"></div> 录音中
-  </div>
+  <div class="recording-badge" id="recBadge"><div class="rec-dot"></div> 录音中</div>
   <button class="btn btn-start" id="startBtn">🎤 开始录音</button>
-  <button class="btn btn-stop"  id="stopBtn" >⏹ 停止录音</button>
-  <button class="btn btn-speak" id="speakBtn">🔊 朗读译文</button>
+  <button class="btn btn-stop"  id="stopBtn">⏹ 停止</button>
+  <button class="btn btn-speak" id="speakBtn">🔊 朗读</button>
   <button class="btn btn-clear" id="clearBtn">清空</button>
 </footer>
 
 <script>
-  const WS_URL = `ws://${location.host}/ws/translate`;
+  // ── Platform detection ──
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const isIOSSafari = isIOS || isSafari;
 
-  // ── State ──
-  let ws = null;
-  let recognition = null;
-  let currentTranslation = "";
-  let isRecording = false;
+  // Warn if not HTTPS and not localhost
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isSecure) {
+    document.getElementById('httpsWarn').style.display = 'flex';
+  }
 
-  // ── Elements ──
-  const wsDot       = document.getElementById('wsDot');
-  const wsLabel     = document.getElementById('wsLabel');
-  const sourceBox   = document.getElementById('sourceBox');
-  const transBox    = document.getElementById('translationBox');
-  const errorBar    = document.getElementById('errorBar');
-  const recBadge    = document.getElementById('recBadge');
-  const startBtn    = document.getElementById('startBtn');
-  const stopBtn     = document.getElementById('stopBtn');
-  const speakBtn    = document.getElementById('speakBtn');
-  const clearBtn    = document.getElementById('clearBtn');
-  const historyWrap = document.getElementById('historyWrap');
-  const historyList = document.getElementById('historyList');
-  const swapBtn     = document.getElementById('swapBtn');
-  const autoTTS     = document.getElementById('autoTTS');
-  const sourceLang  = document.getElementById('sourceLang');
-  const targetLang  = document.getElementById('targetLang');
+  if (isIOSSafari) {
+    document.getElementById('iosTip').style.display = 'block';
+    // Show text input fallback on iOS (as supplement)
+    document.getElementById('textInputWrap').classList.add('show');
+  }
 
   // ── WebSocket ──
-  function connectWS() {
-    ws = new WebSocket(WS_URL);
+  const WS_PROTO = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const WS_URL   = `${WS_PROTO}//${location.host}/ws/translate`;
 
-    ws.onopen = () => {
-      wsDot.classList.add('on');
-      wsLabel.textContent = '已连接';
-    };
-    ws.onclose = () => {
-      wsDot.classList.remove('on');
-      wsLabel.textContent = '重连中…';
-      setTimeout(connectWS, 2500);
-    };
-    ws.onerror = () => showError('WebSocket 连接失败，请确认后端已启动 (uvicorn ai_translation.app:app)');
+  let ws = null;
+  let recognition = null;
+  let currentTranslation = '';
+  let isRecording = false;
+
+  const wsDot      = document.getElementById('wsDot');
+  const wsLabel    = document.getElementById('wsLabel');
+  const sourceBox  = document.getElementById('sourceBox');
+  const transBox   = document.getElementById('translationBox');
+  const errorBar   = document.getElementById('errorBar');
+  const recBadge   = document.getElementById('recBadge');
+  const startBtn   = document.getElementById('startBtn');
+  const stopBtn    = document.getElementById('stopBtn');
+  const speakBtn   = document.getElementById('speakBtn');
+  const clearBtn   = document.getElementById('clearBtn');
+  const swapBtn    = document.getElementById('swapBtn');
+  const autoTTS    = document.getElementById('autoTTS');
+  const sourceLang = document.getElementById('sourceLang');
+  const targetLang = document.getElementById('targetLang');
+  const manualInput = document.getElementById('manualInput');
+
+  function connectWS() {
+    try { ws = new WebSocket(WS_URL); } catch(e) { return; }
+    ws.onopen  = () => { wsDot.classList.add('on'); wsLabel.textContent = '已连接'; };
+    ws.onclose = () => { wsDot.classList.remove('on'); wsLabel.textContent = '重连中'; setTimeout(connectWS, 2500); };
+    ws.onerror = () => showError('WebSocket 连接失败，请确认后端已启动');
     ws.onmessage = (e) => handleMsg(JSON.parse(e.data));
   }
 
   function handleMsg(msg) {
     if (msg.type === 'chunk') {
-      // Clear placeholder on first chunk
       if (transBox.querySelector('.placeholder-text')) transBox.innerHTML = '';
       removeCursor();
       transBox.appendChild(document.createTextNode(msg.content));
       transBox.appendChild(makeCursor());
       currentTranslation = transBox.textContent;
       transBox.classList.add('translating');
-
+      transBox.scrollTop = transBox.scrollHeight;
     } else if (msg.type === 'done') {
       removeCursor();
       transBox.classList.remove('translating');
       currentTranslation = msg.translation;
       addHistory(msg.original, msg.translation);
       if (autoTTS.checked) speak(msg.translation);
-
     } else if (msg.type === 'error') {
       showError('翻译错误：' + msg.message);
       transBox.classList.remove('translating');
@@ -424,21 +497,22 @@
     c.className = 'cursor';
     return c;
   }
-  function removeCursor() {
-    transBox.querySelector('.cursor')?.remove();
-  }
+  function removeCursor() { transBox.querySelector('.cursor')?.remove(); }
 
   // ── Speech Recognition ──
   function initRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      showError('浏览器不支持语音识别，请使用 Chrome 或 Edge');
+      showError('此浏览器不支持语音识别。请使用文字输入，或换用 Safari 15+ / Chrome。');
+      document.getElementById('textInputWrap').classList.add('show');
       return false;
     }
 
     recognition = new SR();
-    recognition.continuous    = true;
-    recognition.interimResults = true;
+    // iOS Safari does NOT support continuous mode — must be false
+    recognition.continuous     = !isIOSSafari;
+    recognition.interimResults = !isIOSSafari; // iOS Safari interim results are unreliable
+    recognition.maxAlternatives = 1;
 
     recognition.onresult = (event) => {
       let interim = '';
@@ -451,49 +525,62 @@
 
       if (sourceBox.querySelector('.placeholder-text')) sourceBox.innerHTML = '';
 
-      // Update interim span
-      let interimEl = sourceBox.querySelector('.interim-text');
-      if (interim) {
-        if (!interimEl) {
-          interimEl = document.createElement('span');
-          interimEl.className = 'interim-text';
-          sourceBox.appendChild(interimEl);
+      if (!isIOSSafari) {
+        // Desktop: show interim text in grey while speaking
+        let interimEl = sourceBox.querySelector('.interim-text');
+        if (interim) {
+          if (!interimEl) {
+            interimEl = document.createElement('span');
+            interimEl.className = 'interim-text';
+            sourceBox.appendChild(interimEl);
+          }
+          interimEl.textContent = interim;
+        } else if (interimEl) {
+          interimEl.remove();
         }
-        interimEl.textContent = interim;
-      } else if (interimEl) {
-        interimEl.remove();
+      } else {
+        // iOS: treat every result as final (no interim support)
+        if (!final_ && interim) final_ = interim;
       }
 
       if (final_) {
-        // Remove interim, append final as paragraph
         sourceBox.querySelector('.interim-text')?.remove();
         const p = document.createElement('p');
         p.textContent = final_;
         sourceBox.appendChild(p);
-
-        // Send for translation
+        sourceBox.scrollTop = sourceBox.scrollHeight;
         sendTranslate(final_);
       }
     };
 
     recognition.onerror = (e) => {
-      if (e.error !== 'no-speech') showError('语音识别错误：' + e.error);
+      if (e.error === 'not-allowed') {
+        showError('麦克风权限被拒绝。请在系统设置 → Safari → 麦克风 中允许访问。');
+        stopRecording();
+      } else if (e.error === 'no-speech') {
+        // Normal — ignore
+      } else {
+        showError('语音识别错误：' + e.error);
+      }
     };
 
-    // Auto-restart keeps listening continuously
     recognition.onend = () => {
-      if (isRecording) recognition.start();
+      // Auto-restart: on iOS single-shot mode; on desktop continuous mode
+      if (isRecording) {
+        try { recognition.start(); } catch(e) { /* already started */ }
+      }
     };
 
     return true;
   }
 
   function sendTranslate(text) {
+    text = text.trim();
+    if (!text) return;
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      showError('WebSocket 未连接，请稍后重试');
+      showError('WebSocket 未连接，请等待重连后重试');
       return;
     }
-    // Clear translation box for new sentence
     transBox.innerHTML = '';
     currentTranslation = '';
     ws.send(JSON.stringify({ text, target_lang: targetLang.value }));
@@ -504,7 +591,11 @@
     if (!recognition && !initRecognition()) return;
     hideError();
     recognition.lang = sourceLang.value;
-    recognition.start();
+    try {
+      recognition.start();
+    } catch(e) {
+      // Already started — ignore
+    }
     isRecording = true;
     startBtn.style.display = 'none';
     stopBtn.style.display  = 'inline-block';
@@ -512,74 +603,86 @@
     sourceBox.classList.add('active');
   });
 
-  stopBtn.addEventListener('click', () => {
+  stopBtn.addEventListener('click', stopRecording);
+
+  function stopRecording() {
     isRecording = false;
-    recognition?.stop();
+    try { recognition?.stop(); } catch(e) {}
     startBtn.style.display = 'inline-block';
     stopBtn.style.display  = 'none';
     recBadge.classList.remove('show');
     sourceBox.classList.remove('active');
-  });
+  }
 
   speakBtn.addEventListener('click', () => {
     if (currentTranslation) speak(currentTranslation);
   });
 
   clearBtn.addEventListener('click', () => {
-    sourceBox.innerHTML   = '<span class="placeholder-text">点击"开始录音"后，讲话内容会实时显示在这里…</span>';
-    transBox.innerHTML    = '<span class="placeholder-text">翻译结果将在这里流式输出…</span>';
+    sourceBox.innerHTML   = '<span class="placeholder-text">点击"开始录音"后开始说话…</span>';
+    transBox.innerHTML    = '<span class="placeholder-text">翻译结果将在这里流式显示…</span>';
     transBox.classList.remove('translating');
-    historyWrap.style.display = 'none';
-    historyList.innerHTML = '';
+    document.getElementById('historyWrap').style.display = 'none';
+    document.getElementById('historyList').innerHTML = '';
     currentTranslation = '';
     speechSynthesis.cancel();
+    manualInput.value = '';
   });
 
-  // Swap source/target language display
   swapBtn.addEventListener('click', () => {
-    const srcVal = sourceLang.value.split('-')[0].toLowerCase();
-    const tgtVal = targetLang.value;
-
-    // Map speech lang code → translate code
-    const speechToTranslate = { zh: 'zh', en: 'en', ja: 'ja', ko: 'ko', fr: 'fr', de: 'de', es: 'es', it: 'it', ru: 'ru' };
-    // Map translate code → speech lang code
-    const translateToSpeech = { zh: 'zh-CN', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR', fr: 'fr-FR', de: 'de-DE', es: 'es-ES', it: 'it-IT', ru: 'ru-RU' };
-
-    const newSpeech = translateToSpeech[tgtVal] || 'zh-CN';
-    const newTarget = speechToTranslate[srcVal] || 'zh';
-
-    // Set select values
-    for (const opt of sourceLang.options) {
-      if (opt.value === newSpeech) { opt.selected = true; break; }
-    }
-    for (const opt of targetLang.options) {
-      if (opt.value === newTarget) { opt.selected = true; break; }
-    }
+    const srcCode = sourceLang.value.split('-')[0].toLowerCase();
+    const tgtCode = targetLang.value;
+    const toSpeech    = { zh:'zh-CN', en:'en-US', ja:'ja-JP', ko:'ko-KR', fr:'fr-FR', de:'de-DE', es:'es-ES', it:'it-IT', ru:'ru-RU' };
+    const toTranslate = { zh:'zh', en:'en', ja:'ja', ko:'ko', fr:'fr', de:'de', es:'es', it:'it', ru:'ru' };
+    setSelect(sourceLang, toSpeech[tgtCode]    || 'zh-CN');
+    setSelect(targetLang, toTranslate[srcCode] || 'zh');
   });
+
+  function setSelect(sel, val) {
+    for (const opt of sel.options) {
+      if (opt.value === val) { opt.selected = true; return; }
+    }
+  }
+
+  // ── Text input fallback ──
+  document.getElementById('sendTextBtn').addEventListener('click', submitManualText);
+  manualInput.addEventListener('keydown', (e) => {
+    // Submit on Enter (not Shift+Enter)
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitManualText(); }
+  });
+
+  function submitManualText() {
+    const text = manualInput.value.trim();
+    if (!text) return;
+    if (sourceBox.querySelector('.placeholder-text')) sourceBox.innerHTML = '';
+    const p = document.createElement('p');
+    p.textContent = text;
+    sourceBox.appendChild(p);
+    manualInput.value = '';
+    sendTranslate(text);
+  }
 
   // ── TTS ──
-  const ttsLangMap = {
-    zh: 'zh-CN', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR',
-    fr: 'fr-FR', de: 'de-DE', es: 'es-ES', it: 'it-IT', ru: 'ru-RU',
-  };
+  const ttsLangMap = { zh:'zh-CN', en:'en-US', ja:'ja-JP', ko:'ko-KR', fr:'fr-FR', de:'de-DE', es:'es-ES', it:'it-IT', ru:'ru-RU' };
 
   function speak(text) {
     speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = ttsLangMap[targetLang.value] || 'zh-CN';
-    utt.rate = 0.95;
+    const utt  = new SpeechSynthesisUtterance(text);
+    utt.lang   = ttsLangMap[targetLang.value] || 'zh-CN';
+    utt.rate   = 0.95;
     speechSynthesis.speak(utt);
   }
 
   // ── History ──
   function addHistory(orig, trans) {
-    historyWrap.style.display = 'block';
+    const wrap = document.getElementById('historyWrap');
+    const list = document.getElementById('historyList');
+    wrap.style.display = 'block';
     const item = document.createElement('div');
     item.className = 'history-item';
     item.innerHTML = `<div class="h-orig">${esc(orig)}</div><div class="h-trans">${esc(trans)}</div>`;
-    historyList.insertBefore(item, historyList.firstChild);
-    // Cap at 30 entries
-    while (historyList.children.length > 30) historyList.removeChild(historyList.lastChild);
+    list.insertBefore(item, list.firstChild);
+    while (list.children.length > 30) list.removeChild(list.lastChild);
   }
 
   function esc(str) {
@@ -589,13 +692,8 @@
   }
 
   // ── Error ──
-  function showError(msg) {
-    errorBar.textContent = '⚠ ' + msg;
-    errorBar.style.display = 'block';
-  }
-  function hideError() {
-    errorBar.style.display = 'none';
-  }
+  function showError(msg) { errorBar.textContent = '⚠ ' + msg; errorBar.style.display = 'flex'; }
+  function hideError()    { errorBar.style.display = 'none'; }
 
   // ── Init ──
   connectWS();
