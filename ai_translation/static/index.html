@@ -341,7 +341,7 @@
 
 <!-- iOS tip -->
 <div class="ios-tip" id="iosTip">
-  📱 iPad 模式：每句话结束后自动识别，请讲完一句再停顿。
+  📱 iPad 模式：边说边翻译，停顿后自动识别下一句（需 Safari 15.4+）。
 </div>
 
 <!-- Error bar -->
@@ -426,15 +426,13 @@
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   const isIOSSafari = isIOS || isSafari;
 
-  // Warn if not HTTPS and not localhost
-  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  if (!isSecure) {
-    document.getElementById('httpsWarn').style.display = 'flex';
-  }
+  const isSecure = location.protocol === 'https:' ||
+                   location.hostname === 'localhost' ||
+                   location.hostname === '127.0.0.1';
+  if (!isSecure) document.getElementById('httpsWarn').style.display = 'flex';
 
   if (isIOSSafari) {
     document.getElementById('iosTip').style.display = 'block';
-    // Show text input fallback on iOS (as supplement)
     document.getElementById('textInputWrap').classList.add('show');
   }
 
@@ -444,8 +442,15 @@
 
   let ws = null;
   let recognition = null;
-  let currentTranslation = '';
   let isRecording = false;
+
+  // Real-time translation state
+  let inFlight = false;           // translation request is pending
+  let pendingText = null;         // text waiting to be sent once inFlight clears
+  let pendingIsFinal = false;
+  let interimTimer = null;        // debounce timer for interim results
+  let currentTranslation = '';
+  let lastFinalText = '';         // avoid re-translating identical final results
 
   const wsDot      = document.getElementById('wsDot');
   const wsLabel    = document.getElementById('wsLabel');
@@ -463,6 +468,7 @@
   const targetLang = document.getElementById('targetLang');
   const manualInput = document.getElementById('manualInput');
 
+  // ── WebSocket ──
   function connectWS() {
     try { ws = new WebSocket(WS_URL); } catch(e) { return; }
     ws.onopen  = () => { wsDot.classList.add('on'); wsLabel.textContent = '已连接'; };
@@ -480,15 +486,30 @@
       currentTranslation = transBox.textContent;
       transBox.classList.add('translating');
       transBox.scrollTop = transBox.scrollHeight;
+
     } else if (msg.type === 'done') {
       removeCursor();
       transBox.classList.remove('translating');
       currentTranslation = msg.translation;
-      addHistory(msg.original, msg.translation);
-      if (autoTTS.checked) speak(msg.translation);
+      inFlight = false;
+
+      // If a newer request was queued while we were translating, send it now
+      if (pendingText) {
+        const txt = pendingText;
+        const fin = pendingIsFinal;
+        pendingText = null;
+        _send(txt, fin);
+      }
+
+      if (msg.isFinal) {
+        addHistory(msg.original, msg.translation);
+        if (autoTTS.checked) speak(msg.translation);
+      }
+
     } else if (msg.type === 'error') {
       showError('翻译错误：' + msg.message);
       transBox.classList.remove('translating');
+      inFlight = false;
     }
   }
 
@@ -503,15 +524,16 @@
   function initRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) {
-      showError('此浏览器不支持语音识别。请使用文字输入，或换用 Safari 15+ / Chrome。');
+      showError('此浏览器不支持语音识别，请使用下方文字输入，或换用 Safari 15.4+ / Chrome。');
       document.getElementById('textInputWrap').classList.add('show');
       return false;
     }
 
     recognition = new SR();
-    // iOS Safari does NOT support continuous mode — must be false
+    // iOS Safari doesn't support continuous mode — restart manually in onend
     recognition.continuous     = !isIOSSafari;
-    recognition.interimResults = !isIOSSafari; // iOS Safari interim results are unreliable
+    // Enable interimResults on ALL platforms for real-time feel
+    recognition.interimResults = true;
     recognition.maxAlternatives = 1;
 
     recognition.onresult = (event) => {
@@ -525,77 +547,93 @@
 
       if (sourceBox.querySelector('.placeholder-text')) sourceBox.innerHTML = '';
 
-      if (!isIOSSafari) {
-        // Desktop: show interim text in grey while speaking
-        let interimEl = sourceBox.querySelector('.interim-text');
-        if (interim) {
-          if (!interimEl) {
-            interimEl = document.createElement('span');
-            interimEl.className = 'interim-text';
-            sourceBox.appendChild(interimEl);
-          }
-          interimEl.textContent = interim;
-        } else if (interimEl) {
-          interimEl.remove();
+      // Update interim display (grey italic)
+      let interimEl = sourceBox.querySelector('.interim-text');
+      if (interim) {
+        if (!interimEl) {
+          interimEl = document.createElement('span');
+          interimEl.className = 'interim-text';
+          sourceBox.appendChild(interimEl);
         }
-      } else {
-        // iOS: treat every result as final (no interim support)
-        if (!final_ && interim) final_ = interim;
+        interimEl.textContent = interim;
+        sourceBox.scrollTop = sourceBox.scrollHeight;
+
+        // Debounce: translate interim after 400 ms of no new speech
+        clearTimeout(interimTimer);
+        interimTimer = setTimeout(() => {
+          if (interim.trim().length > 2) scheduleTranslate(interim.trim(), false);
+        }, 400);
+
+      } else if (interimEl) {
+        interimEl.remove();
       }
 
       if (final_) {
+        clearTimeout(interimTimer);
         sourceBox.querySelector('.interim-text')?.remove();
-        const p = document.createElement('p');
-        p.textContent = final_;
-        sourceBox.appendChild(p);
-        sourceBox.scrollTop = sourceBox.scrollHeight;
-        sendTranslate(final_);
+
+        if (final_ !== lastFinalText) {   // avoid duplicate translate on same sentence
+          lastFinalText = final_;
+          const p = document.createElement('p');
+          p.textContent = final_;
+          sourceBox.appendChild(p);
+          sourceBox.scrollTop = sourceBox.scrollHeight;
+          scheduleTranslate(final_, true);
+        }
       }
     };
 
     recognition.onerror = (e) => {
       if (e.error === 'not-allowed') {
-        showError('麦克风权限被拒绝。请在系统设置 → Safari → 麦克风 中允许访问。');
+        showError('麦克风权限被拒绝。请在设置 → Safari → 麦克风 中允许访问。');
         stopRecording();
-      } else if (e.error === 'no-speech') {
-        // Normal — ignore
-      } else {
+      } else if (e.error !== 'no-speech') {
         showError('语音识别错误：' + e.error);
       }
     };
 
+    // iOS fires onend after each sentence — restart immediately for continuous feel
     recognition.onend = () => {
-      // Auto-restart: on iOS single-shot mode; on desktop continuous mode
       if (isRecording) {
-        try { recognition.start(); } catch(e) { /* already started */ }
+        try { recognition.start(); } catch(_) {}
       }
     };
 
     return true;
   }
 
-  function sendTranslate(text) {
-    text = text.trim();
-    if (!text) return;
+  // scheduleTranslate: queue or send a translation request
+  function scheduleTranslate(text, isFinal) {
+    if (inFlight) {
+      // Already translating — save as pending, overwrite older pending
+      if (isFinal || !pendingIsFinal) {
+        pendingText    = text;
+        pendingIsFinal = isFinal;
+      }
+    } else {
+      _send(text, isFinal);
+    }
+  }
+
+  function _send(text, isFinal) {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       showError('WebSocket 未连接，请等待重连后重试');
       return;
     }
+    // Clear translation box for the new text
     transBox.innerHTML = '';
     currentTranslation = '';
-    ws.send(JSON.stringify({ text, target_lang: targetLang.value }));
+    inFlight = true;
+    ws.send(JSON.stringify({ text, target_lang: targetLang.value, isFinal }));
   }
 
   // ── Buttons ──
   startBtn.addEventListener('click', () => {
     if (!recognition && !initRecognition()) return;
     hideError();
+    lastFinalText = '';
     recognition.lang = sourceLang.value;
-    try {
-      recognition.start();
-    } catch(e) {
-      // Already started — ignore
-    }
+    try { recognition.start(); } catch(_) {}
     isRecording = true;
     startBtn.style.display = 'none';
     stopBtn.style.display  = 'inline-block';
@@ -607,7 +645,8 @@
 
   function stopRecording() {
     isRecording = false;
-    try { recognition?.stop(); } catch(e) {}
+    clearTimeout(interimTimer);
+    try { recognition?.stop(); } catch(_) {}
     startBtn.style.display = 'inline-block';
     stopBtn.style.display  = 'none';
     recBadge.classList.remove('show');

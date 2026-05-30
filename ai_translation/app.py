@@ -44,6 +44,7 @@ async def websocket_translate(websocket: WebSocket):
             msg = json.loads(data)
             text = msg.get("text", "").strip()
             target_lang = msg.get("target_lang", "zh")
+            is_final = msg.get("isFinal", True)
 
             if not text:
                 continue
@@ -90,6 +91,7 @@ async def websocket_translate(websocket: WebSocket):
                     "type": "done",
                     "translation": full_translation,
                     "original": text,
+                    "isFinal": is_final,
                 }))
 
             except Exception as e:
