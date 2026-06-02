@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shang Bo | Portfolio</title>
+  <meta name="description" content="Shang Bo, sculpture graduate student at Accademia di Belle Arti di Brera.">
+  <style>
+    :root {
+      --paper: #f3f0ea;
+      --paper-soft: #e8e3d8;
+      --ink: #171614;
+      --muted: #6d695f;
+      --line: rgba(23, 22, 20, 0.18);
+      --charcoal: #151514;
+      --bronze: #6f7460;
+      --white: #fbfaf7;
+      --gap: clamp(24px, 4vw, 64px);
+      --serif: Georgia, "Times New Roman", "Songti SC", "SimSun", serif;
+      --sans: "Aptos", "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-header {
+      position: fixed;
+      z-index: 10;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px clamp(20px, 4vw, 56px);
+      color: var(--white);
+      mix-blend-mode: difference;
+    }
+
+    .mark {
+      font-family: var(--serif);
+      font-size: 17px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .lang-switch {
+      display: flex;
+      gap: 4px;
+      padding: 3px;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+    }
+
+    .lang-switch button {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: inherit;
+      padding: 6px 9px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .lang-switch button[aria-pressed="true"] {
+      background: rgba(255, 255, 255, 0.24);
+      box-shadow: inset 0 0 0 1px currentColor;
+      color: inherit;
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(280px, 0.72fr);
+      align-items: stretch;
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: clamp(28px, 5vw, 72px);
+      padding: clamp(104px, 12vw, 168px) clamp(24px, 6vw, 88px) clamp(42px, 6vw, 82px);
+    }
+
+    .eyebrow {
+      color: rgba(251, 250, 247, 0.68);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      line-height: 1.7;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(64px, 13vw, 190px);
+      font-weight: 400;
+      line-height: 0.86;
+      letter-spacing: 0;
+    }
+
+    .hero-intro {
+      max-width: 560px;
+      color: rgba(251, 250, 247, 0.78);
+      font-family: var(--serif);
+      font-size: clamp(22px, 3vw, 38px);
+      line-height: 1.16;
+    }
+
+    .hero-media {
+      position: relative;
+      min-height: 100%;
+      overflow: hidden;
+    }
+
+    .hero-media img {
+      height: 100%;
+      min-height: 100svh;
+      object-fit: cover;
+      object-position: center;
+      filter: saturate(0.82) contrast(0.94);
+    }
+
+    .hero-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(21, 21, 20, 0.2), rgba(21, 21, 20, 0));
+    }
+
+    .section {
+      padding: clamp(72px, 10vw, 136px) clamp(20px, 5vw, 72px);
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: minmax(180px, 0.5fr) minmax(0, 1fr);
+      gap: var(--gap);
+      border-top: 1px solid var(--line);
+      padding-top: clamp(28px, 4vw, 48px);
+    }
+
+    .section-kicker {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .statement {
+      margin: 0;
+      max-width: 920px;
+      font-family: var(--serif);
+      font-size: clamp(30px, 5vw, 70px);
+      line-height: 1.04;
+      font-weight: 400;
+    }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: clamp(36px, 6vw, 86px);
+      background: var(--line);
+    }
+
+    .meta-item {
+      min-height: 140px;
+      padding: 24px;
+      background: var(--paper);
+    }
+
+    .meta-label {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .meta-value {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(22px, 2.8vw, 34px);
+      line-height: 1.1;
+    }
+
+    .works-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      border-top: 1px solid var(--line);
+      padding-top: 32px;
+      margin-bottom: clamp(32px, 6vw, 82px);
+    }
+
+    .works-header h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(44px, 8vw, 112px);
+      font-weight: 400;
+      line-height: 0.9;
+    }
+
+    .works-count {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .works {
+      display: grid;
+      gap: clamp(54px, 8vw, 116px);
+    }
+
+    .work {
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(280px, 0.56fr);
+      gap: clamp(24px, 5vw, 74px);
+      align-items: end;
+    }
+
+    .work:nth-child(even) {
+      grid-template-columns: minmax(280px, 0.56fr) minmax(0, 0.86fr);
+    }
+
+    .work:nth-child(even) .work-image {
+      order: 2;
+    }
+
+    .work-image {
+      overflow: hidden;
+      background: #d7d0c2;
+    }
+
+    .work-image img {
+      aspect-ratio: 1.26 / 1;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 700ms ease;
+    }
+
+    .work:hover .work-image img {
+      transform: scale(1.025);
+    }
+
+    .work-text {
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+    }
+
+    .work-index {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.16em;
+    }
+
+    .work-title {
+      margin: 18px 0 18px;
+      font-family: var(--serif);
+      font-size: clamp(34px, 5vw, 74px);
+      font-weight: 400;
+      line-height: 0.96;
+    }
+
+    .work-meta {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+      text-transform: uppercase;
+    }
+
+    .work-desc {
+      margin: 0;
+      max-width: 520px;
+      color: #393630;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .bronze-band {
+      position: relative;
+      min-height: 58vh;
+      display: grid;
+      align-items: end;
+      margin-top: clamp(54px, 8vw, 120px);
+      padding: clamp(32px, 6vw, 80px);
+      color: var(--white);
+      background: var(--charcoal);
+      overflow: hidden;
+    }
+
+    .bronze-band img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.52;
+    }
+
+    .bronze-band::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.08));
+    }
+
+    .band-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+    }
+
+    .band-copy p {
+      margin: 16px 0 0;
+      color: rgba(251, 250, 247, 0.74);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .contact {
+      position: relative;
+      min-height: 68vh;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+      background: var(--paper-soft);
+      padding: clamp(72px, 10vw, 132px) clamp(20px, 5vw, 72px);
+    }
+
+    .contact img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.54;
+    }
+
+    .contact-content {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+    }
+
+    .contact h2 {
+      margin: 0 0 28px;
+      font-family: var(--serif);
+      font-size: clamp(46px, 9vw, 126px);
+      font-weight: 400;
+      line-height: 0.95;
+    }
+
+    .email {
+      display: inline-flex;
+      border-bottom: 1px solid currentColor;
+      padding-bottom: 5px;
+      color: var(--ink);
+      font-size: clamp(18px, 2.4vw, 28px);
+    }
+
+    .site-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px clamp(20px, 5vw, 72px);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 860px) {
+      .site-header {
+        padding: 16px 18px;
+        gap: 12px;
+        width: 100vw;
+        max-width: 100vw;
+        overflow: hidden;
+      }
+
+      .nav a {
+        display: none;
+      }
+
+      .mark {
+        font-size: 15px;
+      }
+
+      .nav {
+        gap: 8px;
+        position: fixed;
+        top: 17px;
+        right: 14px;
+      }
+
+      .lang-switch {
+        gap: 2px;
+        transform: scale(0.78);
+        transform-origin: right center;
+      }
+
+      .lang-switch button {
+        padding: 5px 7px;
+      }
+
+      .hero,
+      .intro-grid,
+      .work,
+      .work:nth-child(even),
+      .meta-row {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-copy {
+        min-height: 68svh;
+        padding: 92px 28px 42px;
+        max-width: 100vw;
+      }
+
+      h1 {
+        max-width: 100%;
+      }
+
+      .hero-intro {
+        font-size: clamp(21px, 7vw, 27px);
+        max-width: 320px;
+      }
+
+      .hero-media img {
+        min-height: 42svh;
+      }
+
+      .work:nth-child(even) .work-image {
+        order: 0;
+      }
+
+      .works-header {
+        display: block;
+      }
+
+      .works-count {
+        display: block;
+        margin-top: 14px;
+      }
+
+      .site-footer {
+        display: block;
+        line-height: 1.9;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="mark" href="#">Shang Bo</a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="#works" data-i18n="navWorks">作品</a>
+      <a href="#contact" data-i18n="navContact">联系</a>
+      <div class="lang-switch" aria-label="Language">
+        <button type="button" data-lang="zh" aria-pressed="true">中</button>
+        <button type="button" data-lang="it" aria-pressed="false">IT</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow" data-i18n="heroKicker">布雷拉美术学院 · 雕塑研究生</p>
+        <div>
+          <h1 id="hero-title">Shang<br>Bo</h1>
+          <p class="hero-intro" data-i18n="heroIntro">以雕塑、装置与材料实验，记录日常物件中沉默的情感、创伤与时间。</p>
+        </div>
+      </div>
+      <div class="hero-media" aria-hidden="true">
+        <img src="assets/hero-gallery-stone.png" alt="">
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="about-title">
+      <div class="intro-grid">
+        <p class="section-kicker" id="about-title" data-i18n="aboutKicker">Artist Profile</p>
+        <p class="statement" data-i18n="statement">尚博的创作从日常材料出发，在石、青铜、铝板、影像与装置之间，寻找不可言说的关系与可被触摸的记忆。</p>
+      </div>
+      <div class="meta-row" aria-label="Artist details">
+        <div class="meta-item">
+          <p class="meta-label" data-i18n="metaEducationLabel">Education</p>
+          <p class="meta-value" data-i18n="metaEducation">布雷拉美术学院<br>雕塑研究生</p>
+        </div>
+        <div class="meta-item">
+          <p class="meta-label" data-i18n="metaPracticeLabel">Practice</p>
+          <p class="meta-value" data-i18n="metaPractice">雕塑<br>装置<br>行为</p>
+        </div>
+        <div class="meta-item">
+          <p class="meta-label" data-i18n="metaLocationLabel">Based In</p>
+          <p class="meta-value" data-i18n="metaLocation">Milano<br>China</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="works" aria-labelledby="works-title">
+      <div class="works-header">
+        <h2 id="works-title" data-i18n="worksTitle">Selected Works</h2>
+        <span class="works-count" data-i18n="worksCount">Five works · 2024-2026</span>
+      </div>
+      <div class="works" id="works-list"></div>
+
+      <aside class="bronze-band" aria-label="Material atmosphere">
+        <img src="assets/hero-gallery-bronze.png" alt="">
+        <div class="band-copy">
+          <p class="section-kicker" data-i18n="bandKicker">Material Note</p>
+          <p data-i18n="bandText">大理石、青铜与铝板并非单纯的材料，而是把脆弱、伤痕和沉默固定下来的方式。</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="contact" id="contact" aria-labelledby="contact-title">
+      <img src="assets/hero-gallery-silence.png" alt="">
+      <div class="contact-content">
+        <p class="section-kicker" data-i18n="contactKicker">Contact</p>
+        <h2 id="contact-title" data-i18n="contactTitle">For exhibitions,<br>studies and dialogue.</h2>
+        <a class="email" href="mailto:shangbo0805@163.com">shangbo0805@163.com</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>© 2026 Shang Bo</span>
+    <span data-i18n="footerNote">Portfolio website · sculpture and installation</span>
+  </footer>
+
+  <script>
+    const copy = {
+      zh: {
+        navWorks: "作品",
+        navContact: "联系",
+        heroKicker: "布雷拉美术学院 · 雕塑研究生",
+        heroIntro: "以雕塑、装置与材料实验，记录日常物件中沉默的情感、创伤与时间。",
+        aboutKicker: "Artist Profile",
+        statement: "尚博的创作从日常材料出发，在石、青铜、铝板、影像与装置之间，寻找不可言说的关系与可被触摸的记忆。",
+        metaEducationLabel: "Education",
+        metaEducation: "布雷拉美术学院<br>雕塑研究生",
+        metaPracticeLabel: "Practice",
+        metaPractice: "雕塑<br>装置<br>行为",
+        metaLocationLabel: "Based In",
+        metaLocation: "Milano<br>China",
+        worksTitle: "Selected Works",
+        worksCount: "五件作品 · 2024-2026",
+        bandKicker: "Material Note",
+        bandText: "大理石、青铜与铝板并非单纯的材料，而是把脆弱、伤痕和沉默固定下来的方式。",
+        contactKicker: "Contact",
+        contactTitle: "展览、研究与交流。",
+        footerNote: "Portfolio website · sculpture and installation"
+      },
+      it: {
+        navWorks: "Opere",
+        navContact: "Contatto",
+        heroKicker: "Accademia di Belle Arti di Brera · Scultura",
+        heroIntro: "Scultura, installazione e sperimentazione materica per trattenere emozioni, ferite e tempo negli oggetti quotidiani.",
+        aboutKicker: "Profilo",
+        statement: "La pratica di Shang Bo parte dai materiali del quotidiano e attraversa pietra, bronzo, alluminio, video e installazione, cercando relazioni indicibili e memorie tattili.",
+        metaEducationLabel: "Formazione",
+        metaEducation: "Accademia di Brera<br>Scultura",
+        metaPracticeLabel: "Pratica",
+        metaPractice: "Scultura<br>Installazione<br>Performance",
+        metaLocationLabel: "Base",
+        metaLocation: "Milano<br>Cina",
+        worksTitle: "Opere Scelte",
+        worksCount: "Cinque opere · 2024-2026",
+        bandKicker: "Nota Materica",
+        bandText: "Marmo, bronzo e alluminio non sono solo materiali: sono modi per fissare fragilità, cicatrici e silenzi.",
+        contactKicker: "Contatto",
+        contactTitle: "Per mostre,<br>studio e dialogo.",
+        footerNote: "Portfolio website · scultura e installazione"
+      },
+      en: {
+        navWorks: "Works",
+        navContact: "Contact",
+        heroKicker: "Accademia di Belle Arti di Brera · Sculpture",
+        heroIntro: "Sculpture, installation and material experiments that hold silent emotion, trauma and time inside everyday objects.",
+        aboutKicker: "Artist Profile",
+        statement: "Shang Bo's practice begins with everyday materials, moving through stone, bronze, aluminum, video and installation to search for unspoken relations and tactile memory.",
+        metaEducationLabel: "Education",
+        metaEducation: "Accademia di Brera<br>Sculpture",
+        metaPracticeLabel: "Practice",
+        metaPractice: "Sculpture<br>Installation<br>Performance",
+        metaLocationLabel: "Based In",
+        metaLocation: "Milano<br>China",
+        worksTitle: "Selected Works",
+        worksCount: "Five works · 2024-2026",
+        bandKicker: "Material Note",
+        bandText: "Marble, bronze and aluminum are not only materials: they become ways to fix fragility, scars and silence.",
+        contactKicker: "Contact",
+        contactTitle: "For exhibitions,<br>studies and dialogue.",
+        footerNote: "Portfolio website · sculpture and installation"
+      }
+    };
+
+    const works = [
+      {
+        image: "assets/work-black-box.jpg",
+        title: "BLACK BOX",
+        year: "2024",
+        medium: {
+          zh: "装置雕塑 · 木盒、笔、喷漆",
+          it: "Installazione scultorea · scatole di legno, penna, vernice spray",
+          en: "Sculptural installation · wooden boxes, pen, spray paint"
+        },
+        desc: {
+          zh: "二十五个黑色立方体对应二十五年的成长。写在表面的黑色文字，指向亲密关系中长期无法说出口的情感。",
+          it: "Venticinque cubi neri corrispondono agli anni della crescita. Le frasi scritte in nero rendono visibile una relazione intima rimasta inespressa.",
+          en: "Twenty-five black cubes correspond to twenty-five years of growth. The black writing on their surfaces makes visible an intimate relationship that remained unspoken."
+        }
+      },
+      {
+        image: "assets/work-buio.jpg",
+        title: "BUIO",
+        year: "2024",
+        medium: {
+          zh: "多媒体装置 · 视频",
+          it: "Installazione multimediale · video",
+          en: "Multimedia installation · video"
+        },
+        desc: {
+          zh: "作品以第一与第三人称视角模拟失明后的出行经验，用红色与绿色框标记危险、障碍和帮助。",
+          it: "L'opera simula l'esperienza di uscire senza vista, alternando prima e terza persona e segnando pericoli, ostacoli e aiuti.",
+          en: "The work simulates the experience of moving through the city without sight, using first- and third-person perspectives to mark danger, obstacles and help."
+        }
+      },
+      {
+        image: "assets/work-tangibile.jpg",
+        title: "TANGIBILE",
+        year: "2024",
+        medium: {
+          zh: "装置雕塑 · 铝板",
+          it: "Installazione scultorea · lastra di alluminio",
+          en: "Sculptural installation · aluminum sheet"
+        },
+        desc: {
+          zh: "铝板浮雕将盲文与凸凹形态并置，让不可见或难以想象的事物通过触摸被重新接近。",
+          it: "Rilievi in alluminio accostano Braille e forme convesse, permettendo di avvicinare attraverso il tatto ciò che resta difficile da immaginare.",
+          en: "Aluminum reliefs combine Braille and raised forms, allowing things that are invisible or hard to imagine to be approached through touch."
+        }
+      },
+      {
+        image: "assets/work-pane-di-pietra.jpg",
+        title: "Il Pane di Pietra",
+        year: "2026",
+        medium: {
+          zh: "大理石雕塑",
+          it: "Scultura in marmo",
+          en: "Marble sculpture"
+        },
+        desc: {
+          zh: "作品将面包转化为石质遗物，在可食与不可食、贫穷与纪念之间制造静默的矛盾。",
+          it: "Il pane viene trasformato in reperto di pietra, sospeso tra nutrimento e impossibilità, povertà e monumento.",
+          en: "Bread is transformed into a stone relic, suspended between nourishment and impossibility, poverty and monument."
+        }
+      },
+      {
+        image: "assets/work-monumenti-insoluto.jpg",
+        title: "Monumenti all'Insoluto",
+        year: "2026",
+        medium: {
+          zh: "青铜铸造",
+          it: "Fusione in bronzo",
+          en: "Bronze casting"
+        },
+        desc: {
+          zh: "破碎的日用器物被青铜固定为纪念碑。裂缝不再被隐藏，而成为创伤、修复与韧性的地图。",
+          it: "Oggetti domestici fratturati vengono fissati nel bronzo come monumenti. La crepa non è nascosta, ma diventa mappa di trauma, riparazione e resilienza.",
+          en: "Broken domestic objects are fixed in bronze as monuments. The fracture is not hidden, but becomes a map of trauma, repair and resilience."
+        }
+      }
+    ];
+
+    const worksList = document.querySelector("#works-list");
+    let currentLang = "zh";
+
+    function renderWorks(lang) {
+      worksList.innerHTML = works.map((work, index) => `
+        <article class="work">
+          <figure class="work-image">
+            <img src="${work.image}" alt="${work.title}">
+          </figure>
+          <div class="work-text">
+            <span class="work-index">${String(index + 1).padStart(2, "0")}</span>
+            <h3 class="work-title">${work.title}</h3>
+            <p class="work-meta">${work.year} · ${work.medium[lang]}</p>
+            <p class="work-desc">${work.desc[lang]}</p>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        node.innerHTML = copy[lang][node.dataset.i18n];
+      });
+      document.querySelectorAll("[data-lang]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.lang === lang));
+      });
+      renderWorks(lang);
+    }
+
+    document.querySelectorAll("[data-lang]").forEach((button) => {
+      button.addEventListener("click", () => setLanguage(button.dataset.lang));
+    });
+
+    setLanguage(currentLang);
+  </script>
+</body>
+</html>
