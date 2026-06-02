@@ -433,19 +433,21 @@
 
       .nav {
         gap: 8px;
-        position: fixed;
-        top: 17px;
-        right: 14px;
       }
 
       .lang-switch {
+        position: fixed;
+        top: 17px;
+        right: 16px;
+        display: grid;
         gap: 2px;
-        transform: scale(0.78);
-        transform-origin: right center;
+        transform: none;
+        background: rgba(20, 20, 18, 0.22);
+        backdrop-filter: blur(8px);
       }
 
       .lang-switch button {
-        padding: 5px 7px;
+        padding: 5px 6px;
       }
 
       .hero,
